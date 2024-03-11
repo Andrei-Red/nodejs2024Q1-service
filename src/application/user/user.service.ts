@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DataBaseService } from '../../data-base/data-base.service';
 
 @Injectable()
@@ -16,6 +16,12 @@ export class UserService {
   }
 
   getUserById(id) {
+    if (!uuidValidate(id)) {
+      throw new HttpException(
+        'userId is invalid (not uuid)',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const user = this.usersDB.find((user) => user.id === id);
     if (user) {
       return {
@@ -53,6 +59,7 @@ export class UserService {
   }
 
   deleteUser(userID: string) {
+    console.log('ddd');
     const initialLength = this.usersDB.length;
     this.usersDB = this.usersDB.filter((user) => user.id !== userID);
     return this.usersDB.length !== initialLength;

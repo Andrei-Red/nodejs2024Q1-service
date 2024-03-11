@@ -8,10 +8,12 @@ import { TracksController } from './tracks/tracks.controller';
 import { AlbumsController } from './albums/albums.controller';
 import { ArtistsController } from './artists/artists.controller';
 import { ArtistsService } from './artists/artists.service';
+import { DataBaseService } from '../data-base/data-base.service';
+import { DataBaseModule } from '../data-base/data-base.module';
 
 @Module({
-  imports: [UserModule],
-  providers: [AlbumsService, TracksService, FavoritesService, ArtistsService],
+  imports: [UserModule, DataBaseModule],
+  providers: [DataBaseService, AlbumsService, TracksService, FavoritesService, ArtistsService],
   controllers: [FavoritesController, TracksController, AlbumsController, ArtistsController],
 })
 export class ApplicationModule {}

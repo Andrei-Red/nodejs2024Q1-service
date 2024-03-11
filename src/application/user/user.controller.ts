@@ -14,11 +14,17 @@ export class UserController {
   constructor(private userService: UserService) {}
   @Get()
   getUsers() {
+    console.log('getUsers');
     return this.userService.getUsers();
   }
 
   @Get(':id')
   getUserById(@Param() id: string) {
+    if (typeof id !== 'string') {
+      // @ts-ignore
+      id = id?.id
+    }
+
     return this.userService.getUserById(id);
   }
 
