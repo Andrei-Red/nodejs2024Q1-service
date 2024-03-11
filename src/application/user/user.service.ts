@@ -46,12 +46,39 @@ export class UserService {
     return this.getUserById(newUser.id);
   }
 
-  updateUser(user) {
-    const currentUser = this.getUserById(user.id);
+  updateUser(user, id) {
+    const currentUser = this.usersDB.find((user) => user.id === id);
+    if (!uuidValidate(id)) {
+      throw new HttpException(
+        'userId is invalid (not uuid)',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (!currentUser) {
+      throw new HttpException(
+        `user with id=${id} doesn't exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (user.oldPassword === user.newPassword) {
+      throw new HttpException(
+        `new user password must differ from old`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    if (currentUser.password !== user.oldPassword) {
+      throw new HttpException(
+        `old user password is wrong`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const userFields = Object.keys(user);
-    userFields.forEach((field) => {
-      currentUser[field] = user[field];
-    });
+    // userFields.forEach((field) => {
+    //   currentUser[field] = user[field];
+    // });
+    currentUser.password = user.newPassword;
     currentUser.updatedAt = new Date();
     currentUser.version = currentUser.version + 1;
 

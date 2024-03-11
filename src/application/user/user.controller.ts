@@ -34,9 +34,10 @@ export class UserController {
     return this.userService.addNewUser(user);
   }
 
-  @Put()
-  updateUser(@Body() user) {
-    return this.userService.updateUser(user);
+  @Put(':id')
+  updateUser(@Param('id') id: string, @Body() user) {
+    console.log('updateUser', id);
+    return this.userService.updateUser(user, id);
   }
 
   @Delete(':id')

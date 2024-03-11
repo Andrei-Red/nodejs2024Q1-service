@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { DataBaseService } from '../../data-base/data-base.service';
 
 @Injectable()
@@ -27,8 +27,14 @@ export class ArtistsService {
     return newArtist;
   }
 
-  updateArtist(artist) {
-    const index = this.artistsDB.findIndex(a => a.id === artist.id);
+  updateArtist(artist, id) {
+    if (!uuidValidate(id)) {
+      throw new HttpException(
+        'TrackId is invalid (not uuid)',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const index = this.artistsDB.findIndex(a => a.id === id);
     if (index !== -1) {
       this.artistsDB[index] = artist;
       return artist;
@@ -37,6 +43,12 @@ export class ArtistsService {
   }
 
   deleteArtist(artistId: string) {
+    if (!uuidValidate(artistId)) {
+      throw new HttpException(
+        'TrackId is invalid (not uuid)',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const initialLength = this.artistsDB.length;
     this.artistsDB = this.artistsDB.filter(artist => artist.id !== artistId);
     return this.artistsDB.length !== initialLength;

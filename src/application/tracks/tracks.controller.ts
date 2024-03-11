@@ -12,6 +12,7 @@ export class TracksController {
 
   @Get(':id')
   getTrackById(@Param('id') id: string) {
+    console.log('getTrackById');
     return this.trackService.getTrackById(id);
   }
 
@@ -20,9 +21,9 @@ export class TracksController {
     return this.trackService.addNewTrack(track);
   }
 
-  @Put()
-  updateTrack(@Body() track) {
-    return this.trackService.updateTrack(track);
+  @Put(':id')
+  updateTrack(@Param('id') id: string, @Body() track) {
+    return this.trackService.updateTrack(track, id);
   }
 
   @Delete(':id')

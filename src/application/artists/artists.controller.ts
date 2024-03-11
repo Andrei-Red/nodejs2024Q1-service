@@ -20,9 +20,9 @@ export class ArtistsController {
     return this.artistService.addNewArtist(artist);
   }
 
-  @Put()
-  updateArtist(@Body() artist) {
-    return this.artistService.updateArtist(artist);
+  @Put(':id')
+  updateArtist(@Param('id') id: string, @Body() artist) {
+    return this.artistService.updateArtist(artist, id);
   }
 
   @Delete(':id')
