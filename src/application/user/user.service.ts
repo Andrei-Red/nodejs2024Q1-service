@@ -1,60 +1,77 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Injectable } from '@nestjs/common';
-import { DataBaseService } from '../../data-base/data-base.service';
+import { v4 as uuid4 } from 'uuid'
+
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
+import { DataBaseService } from '../../data-base/data-base.service'
+import { CreateUsersDto, UpdateUsersDto } from './user.dto'
+import { User } from '../../data-base/dataInteface'
 
 @Injectable()
 export class UserService {
-  usersDB: any[];
-  constructor(private dataBase: DataBaseService) {
-    this.usersDB = dataBase.db.user;
-  }
-  getUsers() {
-    return this.usersDB.map((user) => ({
-      ...user,
-      password: undefined,
-    }));
-  }
-
-  getUserById(id) {
-    const user = this.usersDB.find((user) => user.id === id);
-    if (user) {
-      return {
-        ...user,
-        password: undefined,
-      };
+  constructor(private db: DataBaseService) {}
+  private createNewUser({ login, password }: CreateUsersDto) {
+    return {
+      id: uuid4(),
+      login: login,
+      password: password,
+      version: 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     }
-    return null;
+  }
+  async createUser(createUserDto: CreateUsersDto): Promise<User> {
+    const newUser = this.createNewUser(createUserDto)
+    const existingUser = this.db.users.find(
+      (user) => user.login === newUser.login,
+    )
+
+    if (existingUser) {
+      throw new HttpException(
+        'User with the same name already exists',
+        HttpStatus.CONFLICT,
+      )
+    }
+
+    // TODO: add "await" when implemented in DB
+    this.db.users.push(newUser)
+    return newUser
   }
 
-  addNewUser(user) {
-    const newUser = {
-      ...user,
-      id: uuidv4(),
-      version: 0,
-      createdAt: new Date(),
-    };
-    // console.log('newUser', newUser);
-    this.usersDB.push(newUser);
-    // console.log('this.usersDB', this.usersDB);
-    console.log('toRES-addNewUser', this.getUserById(newUser.id));
-    return this.getUserById(newUser.id);
+  async findAllUsers() {
+    return this.db.users
   }
 
-  updateUser(user) {
-    const currentUser = this.getUserById(user.id);
-    const userFields = Object.keys(user);
-    userFields.forEach((field) => {
-      currentUser[field] = user[field];
-    });
-    currentUser.updatedAt = new Date();
-    currentUser.version = currentUser.version + 1;
-
-    return this.getUserById(currentUser.id);
+  async findOneUser(id: string) {
+    const currentUser = this.db.users.find((user) => user.id === id)
+    if (!currentUser) {
+      throw new NotFoundException(`User with id ${id} not found`)
+    }
+    return currentUser
   }
 
-  deleteUser(userID: string) {
-    const initialLength = this.usersDB.length;
-    this.usersDB = this.usersDB.filter((user) => user.id !== userID);
-    return this.usersDB.length !== initialLength;
+  async updateUser(id: string, updateUserDto: UpdateUsersDto) {
+    const currentUser = await this.findOneUser(id)
+
+    if (currentUser.password !== updateUserDto.oldPassword) {
+      throw new HttpException('Old password does not match', 403)
+    }
+
+    currentUser.password = updateUserDto.newPassword
+    currentUser.version = currentUser.version + 1
+    currentUser.updatedAt = Date.now()
+
+    return currentUser
+  }
+
+  async removeUser(id: string) {
+    const currentUser = await this.findOneUser(id)
+    const index = this.db.users.findIndex((u) => u.id === currentUser.id)
+    if (index !== -1) {
+      this.db.users.splice(index, 1)
+    }
   }
 }

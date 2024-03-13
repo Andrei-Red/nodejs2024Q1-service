@@ -2,39 +2,49 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Body,
   Param,
   Delete,
-} from '@nestjs/common';
-import { UserService } from './user.service';
+  ClassSerializerInterceptor,
+  UseInterceptors,
+  ParseUUIDPipe,
+  Put,
+  HttpCode,
+} from '@nestjs/common'
+import { UserService } from './user.service'
+import { CreateUsersDto, UpdateUsersDto } from './user.dto'
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
+
+  @Post()
+  createUser(@Body() createUserDto: CreateUsersDto) {
+    return this.userService.createUser(createUserDto)
+  }
+
   @Get()
-  getUsers() {
-    return this.userService.getUsers();
+  findAllUsers() {
+    return this.userService.findAllUsers()
   }
 
   @Get(':id')
-  getUserById(@Param() id: string) {
-    return this.userService.getUserById(id);
+  findOneUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.userService.findOneUser(id)
   }
 
-  @Post()
-  addNewUser(@Body() user) {
-    console.log('user', user);
-    return this.userService.addNewUser(user);
-  }
-
-  @Put()
-  updateUser(@Body() user) {
-    return this.userService.updateUser(user);
+  @Put(':id')
+  updateUser(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateUserDto: UpdateUsersDto,
+  ) {
+    return this.userService.updateUser(id, updateUserDto)
   }
 
   @Delete(':id')
-  deleteUser(@Param() id: string) {
-    return this.userService.deleteUser(id);
+  @HttpCode(204)
+  removeUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.userService.removeUser(id)
   }
 }
