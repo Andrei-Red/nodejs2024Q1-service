@@ -4,6 +4,16 @@ export const enum DbEntities {
   USERS = 'users',
   TRACKS = 'tracks',
 }
+
+export interface User {
+  id: string;
+  login: string;
+  password: string;
+  version: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface Album {
   id: string;
   name: string;
@@ -31,4 +41,10 @@ export interface Track {
   artistId: string | null;
   albumId: string | null;
   duration: number;
+}
+
+export interface Favorites {
+  artists: string[];
+  albums: string[];
+  tracks: string[];
 }

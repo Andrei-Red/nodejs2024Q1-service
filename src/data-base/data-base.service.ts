@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Album, Artist, DbEntities, Track } from './dataInteface';
+import {
+  Album,
+  Artist,
+  DbEntities,
+  Favorites,
+  Track,
+  User,
+} from './dataInteface';
 
 @Injectable()
 export class DataBaseService {
-  users: UserEntity[] = [];
+  users: User[] = [];
   albums: Album[] = [];
   artists: Artist[] = [];
   tracks: Track[] = [];
@@ -15,8 +22,8 @@ export class DataBaseService {
   };
 
   verifyEntityPresence(entityId: string, entityType: DbEntities): boolean {
-    const entities = this[entityType];
-    const matchingEntity = entities.find((entity) => entity.id === entityId);
-    return matchingEntity ? false : true;
+    const entities: any = this[entityType];
+    const matchingEntity = entities?.find((entity) => entity.id === entityId);
+    return !matchingEntity;
   }
 }

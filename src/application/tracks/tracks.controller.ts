@@ -13,7 +13,7 @@ import { TracksService } from './tracks.service';
 import { CreateTracksDto, UpdateTracksDto } from './tracks.dto';
 
 @Controller('track')
-export class TrackController {
+export class TracksController {
   constructor(private readonly trackService: TracksService) {}
 
   @Post()

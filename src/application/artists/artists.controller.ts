@@ -13,7 +13,7 @@ import { ArtistsService } from './artists.service';
 import { CreateArtistsDto, UpdateArtistsDto } from './artists.dto';
 
 @Controller('artist')
-export class ArtistController {
+export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
   @Post()
