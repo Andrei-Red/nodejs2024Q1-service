@@ -1,45 +1,81 @@
-import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuid4 } from 'uuid';
+
+import { Injectable, NotFoundException } from '@nestjs/common';
+
+import { CreateAlbumsDto, UpdateAlbumsDto } from './albums.dto';
 import { DataBaseService } from '../../data-base/data-base.service';
+import { DbEntities, Track } from '../../data-base/dataInteface';
 
 @Injectable()
 export class AlbumsService {
-  albumsDB: any[];
-
-  constructor(private dataBase: DataBaseService) {
-    const test = dataBase;
-    this.albumsDB = test.db.album;
-  }
-
-  getAlbums() {
-    return this.albumsDB;
-  }
-
-  getAlbumById(id: string) {
-    return this.albumsDB.find((album) => album.id === id);
-  }
-
-  addNewAlbum(album) {
-    const newAlbum = {
-      ...album,
-      id: uuidv4(),
+  constructor(private db: DataBaseService) {}
+  createNewAlbum({ name, year, artistId }: CreateAlbumsDto) {
+    return {
+      id: uuid4(),
+      name: name,
+      year: year,
+      artistId: artistId,
     };
-    this.albumsDB.push(newAlbum);
+  }
+  async createAlbum(createAlbumDto: CreateAlbumsDto) {
+    const conditionArtist = this.db.verifyEntityPresence(
+      createAlbumDto.artistId,
+      DbEntities.ARTISTS,
+    );
+    if (conditionArtist && createAlbumDto.artistId) {
+      throw new NotFoundException(
+        `Artist with ID ${createAlbumDto.artistId} not found`,
+      );
+    }
+    const newAlbum = this.createNewAlbum(createAlbumDto);
+    this.db.albums.push(newAlbum);
     return newAlbum;
   }
 
-  updateAlbum(album) {
-    const index = this.albumsDB.findIndex((a) => a.id === album.id);
-    if (index !== -1) {
-      this.albumsDB[index] = album;
-      return album;
-    }
-    return null;
+  async findAllAlbums() {
+    return this.db.albums;
   }
 
-  deleteAlbum(albumId: string) {
-    const initialLength = this.albumsDB.length;
-    this.albumsDB = this.albumsDB.filter((album) => album.id !== albumId);
-    return this.albumsDB.length !== initialLength;
+  async findOneAlbum(id: string) {
+    const currentAlbum = this.db.albums.find((album) => album.id === id);
+    if (!currentAlbum) {
+      throw new NotFoundException(`Album with id ${id} not found`);
+    }
+    return currentAlbum;
+  }
+
+  async updateAlbum(id: string, UpdateAlbumsDto: UpdateAlbumsDto) {
+    const currentAlbum = await this.findOneAlbum(id);
+    const conditionArtist = this.db.verifyEntityPresence(
+      UpdateAlbumsDto.artistId,
+      DbEntities.ARTISTS,
+    );
+    if (conditionArtist && UpdateAlbumsDto.artistId) {
+      throw new NotFoundException(
+        `Artist with ID ${UpdateAlbumsDto.artistId} not found`,
+      );
+    }
+    currentAlbum.artistId = UpdateAlbumsDto.artistId;
+    currentAlbum.name = UpdateAlbumsDto.name;
+    currentAlbum.year = UpdateAlbumsDto.year;
+    return currentAlbum;
+  }
+
+  async removeAlbum(id: string) {
+    const currentAlbum = await this.findOneAlbum(id);
+    const index = this.db.albums.findIndex((u) => u.id === currentAlbum.id);
+    this.db.tracks.forEach((track: Track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
+
+    this.db.favorites.albums = this.db.favorites.albums.filter(
+      (albumsId: string) => albumsId !== id,
+    );
+
+    if (index !== -1) {
+      this.db.albums.splice(index, 1);
+    }
   }
 }
