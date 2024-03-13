@@ -8,9 +8,9 @@ import {
   Delete,
   Param,
   Put,
-} from '@nestjs/common';
-import { ArtistsService } from './artists.service';
-import { CreateArtistsDto, UpdateArtistsDto } from './artists.dto';
+} from '@nestjs/common'
+import { ArtistsService } from './artists.service'
+import { CreateArtistsDto, UpdateArtistsDto } from './artists.dto'
 
 @Controller('artist')
 export class ArtistsController {
@@ -18,17 +18,17 @@ export class ArtistsController {
 
   @Post()
   createArtist(@Body() createArtistDto: CreateArtistsDto) {
-    return this.artistsService.createArtist(createArtistDto);
+    return this.artistsService.createArtist(createArtistDto)
   }
 
   @Get()
   findAllArtists() {
-    return this.artistsService.findAllArtists();
+    return this.artistsService.findAllArtists()
   }
 
   @Get(':id')
   findOneArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.artistsService.findOneArtist(id);
+    return this.artistsService.findOneArtist(id)
   }
 
   @Put(':id')
@@ -36,12 +36,12 @@ export class ArtistsController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: UpdateArtistsDto,
   ) {
-    return this.artistsService.updateArtist(id, updateArtistDto);
+    return this.artistsService.updateArtist(id, updateArtistDto)
   }
 
   @Delete(':id')
   @HttpCode(204)
   removeArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.artistsService.removeArtist(id);
+    return this.artistsService.removeArtist(id)
   }
 }

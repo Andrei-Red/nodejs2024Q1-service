@@ -10,9 +10,9 @@ import {
   ParseUUIDPipe,
   Put,
   HttpCode,
-} from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUsersDto, UpdateUsersDto } from './user.dto';
+} from '@nestjs/common'
+import { UserService } from './user.service'
+import { CreateUsersDto, UpdateUsersDto } from './user.dto'
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -21,17 +21,17 @@ export class UserController {
 
   @Post()
   createUser(@Body() createUserDto: CreateUsersDto) {
-    return this.userService.createUser(createUserDto);
+    return this.userService.createUser(createUserDto)
   }
 
   @Get()
   findAllUsers() {
-    return this.userService.findAllUsers();
+    return this.userService.findAllUsers()
   }
 
   @Get(':id')
   findOneUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.userService.findOneUser(id);
+    return this.userService.findOneUser(id)
   }
 
   @Put(':id')
@@ -39,12 +39,12 @@ export class UserController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserDto: UpdateUsersDto,
   ) {
-    return this.userService.updateUser(id, updateUserDto);
+    return this.userService.updateUser(id, updateUserDto)
   }
 
   @Delete(':id')
   @HttpCode(204)
   removeUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.userService.removeUser(id);
+    return this.userService.removeUser(id)
   }
 }

@@ -1,16 +1,16 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/mapped-types'
 import {
   IsString,
   IsNotEmpty,
   IsUUID,
   IsInt,
   ValidateIf,
-} from 'class-validator';
+} from 'class-validator'
 
 export class CreateTracksDto {
   @IsString({ message: 'Field "name" must be a string' })
   @IsNotEmpty({ message: 'Field "name" cannot be empty' })
-  name: string;
+  name: string
 
   @ValidateIf((o) => o.artistId !== null)
   @IsString({ message: 'Field "artistId" must be a string or null' })
@@ -18,7 +18,7 @@ export class CreateTracksDto {
     message: 'Field "artistId" must be a valid UUID v4 string',
     each: true,
   })
-  artistId: string | null;
+  artistId: string | null
 
   @ValidateIf((o) => o.albumId !== null)
   @IsString({ message: 'Field "albumId" must be a string or null' })
@@ -26,16 +26,16 @@ export class CreateTracksDto {
     message: 'Field "albumId" must be a valid UUID v4 string',
     each: true,
   })
-  albumId: string | null;
+  albumId: string | null
 
   @IsInt({ message: 'Field "duration" must be an integer' })
-  duration: number;
+  duration: number
 }
 
 export class UpdateTracksDto extends PartialType(CreateTracksDto) {
   @IsString({ message: 'Field "name" must be a string' })
   @IsNotEmpty({ message: 'Field "name" cannot be empty' })
-  name: string;
+  name: string
 
   @ValidateIf((o) => o.artistId !== null)
   @IsString({ message: 'Field "artistId" must be a string or null' })
@@ -43,7 +43,7 @@ export class UpdateTracksDto extends PartialType(CreateTracksDto) {
     message: 'Field "artistId" must be a valid UUID v4 string',
     each: true,
   })
-  artistId: string | null;
+  artistId: string | null
 
   @ValidateIf((o) => o.albumId !== null)
   @IsString({ message: 'Field "albumId" must be a string or null' })
@@ -51,8 +51,8 @@ export class UpdateTracksDto extends PartialType(CreateTracksDto) {
     message: 'Field "albumId" must be a valid UUID v4 string',
     each: true,
   })
-  albumId: string | null;
+  albumId: string | null
 
   @IsInt({ message: 'Field "duration" must be an integer' })
-  duration: number;
+  duration: number
 }

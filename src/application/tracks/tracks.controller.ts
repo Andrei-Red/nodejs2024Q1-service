@@ -8,9 +8,9 @@ import {
   Body,
   Delete,
   Param,
-} from '@nestjs/common';
-import { TracksService } from './tracks.service';
-import { CreateTracksDto, UpdateTracksDto } from './tracks.dto';
+} from '@nestjs/common'
+import { TracksService } from './tracks.service'
+import { CreateTracksDto, UpdateTracksDto } from './tracks.dto'
 
 @Controller('track')
 export class TracksController {
@@ -18,17 +18,17 @@ export class TracksController {
 
   @Post()
   createTrack(@Body() createTrackDto: CreateTracksDto) {
-    return this.trackService.createTrack(createTrackDto);
+    return this.trackService.createTrack(createTrackDto)
   }
 
   @Get()
   findAllTracks() {
-    return this.trackService.findAllTracks();
+    return this.trackService.findAllTracks()
   }
 
   @Get(':id')
   findOneTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.trackService.findOneTrack(id);
+    return this.trackService.findOneTrack(id)
   }
 
   @Put(':id')
@@ -36,12 +36,12 @@ export class TracksController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateTrackDto: UpdateTracksDto,
   ) {
-    return this.trackService.updateTrack(id, updateTrackDto);
+    return this.trackService.updateTrack(id, updateTrackDto)
   }
 
   @Delete(':id')
   @HttpCode(204)
   removeTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.trackService.removeTrack(id);
+    return this.trackService.removeTrack(id)
   }
 }

@@ -6,8 +6,8 @@ import {
   Get,
   Post,
   Param,
-} from '@nestjs/common';
-import { FavoritesService } from './favorites.service';
+} from '@nestjs/common'
+import { FavoritesService } from './favorites.service'
 
 @Controller('favs')
 export class FavoritesController {
@@ -18,12 +18,12 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Param('type') type: string,
   ) {
-    return this.favoriteService.createFavorite(id, type);
+    return this.favoriteService.createFavorite(id, type)
   }
 
   @Get()
   findAllFavorites() {
-    return this.favoriteService.findAllFavorites();
+    return this.favoriteService.findAllFavorites()
   }
 
   @Delete(':type/:id')
@@ -32,6 +32,6 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Param('type') type: string,
   ) {
-    return this.favoriteService.removeType(id, type);
+    return this.favoriteService.removeType(id, type)
   }
 }
