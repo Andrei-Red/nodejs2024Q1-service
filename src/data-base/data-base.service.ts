@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Album, DbEntities } from './dataInteface';
-// import { Album } from '../application/albums/albums.dto';
-// import DB from 'db.json';
+import { Album, Artist, DbEntities, Track } from './dataInteface';
+
 @Injectable()
 export class DataBaseService {
   users: UserEntity[] = [];

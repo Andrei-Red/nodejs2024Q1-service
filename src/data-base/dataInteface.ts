@@ -1,8 +1,8 @@
 export const enum DbEntities {
-  USERS = 'users',
-  TRACKS = 'tracks',
   ARTISTS = 'artists',
   ALBUMS = 'albums',
+  USERS = 'users',
+  TRACKS = 'tracks',
 }
 export interface Album {
   id: string;
@@ -23,4 +23,12 @@ export interface Artist {
   id: string;
   name: string;
   grammy: boolean;
+}
+
+export interface Track {
+  id: string;
+  name: string;
+  artistId: string | null;
+  albumId: string | null;
+  duration: number;
 }
