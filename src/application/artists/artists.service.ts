@@ -1,56 +1,70 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { v4 as uuid4 } from 'uuid';
+
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataBaseService } from '../../data-base/data-base.service';
+import { CreateArtistsDto, UpdateArtistsDto } from './artists.dto';
+import { Artist } from '../../data-base/dataInteface';
 
 @Injectable()
 export class ArtistsService {
-  artistsDB: any[];
-
-  constructor(private dataBase: DataBaseService) {
-    this.artistsDB = dataBase.db.artist;
-  }
-
-  getArtists() {
-    return this.artistsDB;
-  }
-
-  getArtistById(id: string) {
-    return this.artistsDB.find(artist => artist.id === id);
-  }
-
-  addNewArtist(artist) {
-    const newArtist = {
-      ...artist,
-      id: uuidv4(),
+  constructor(private db: DataBaseService) {}
+  private createNewArtist({ name, grammy }: CreateArtistsDto) {
+    return {
+      id: uuid4(),
+      name: name,
+      grammy: grammy,
     };
-    this.artistsDB.push(newArtist);
+  }
+
+  async createArtist(createArtistsDto: CreateArtistsDto): Promise<Artist> {
+    const newArtist = this.createNewArtist(createArtistsDto);
+    // TODO: add "await" when implemented in DB
+    this.db.artists.push(newArtist);
     return newArtist;
   }
-
-  updateArtist(artist, id) {
-    if (!uuidValidate(id)) {
-      throw new HttpException(
-        'TrackId is invalid (not uuid)',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const index = this.artistsDB.findIndex(a => a.id === id);
-    if (index !== -1) {
-      this.artistsDB[index] = artist;
-      return artist;
-    }
-    return null;
+  async findAllArtists() {
+    return this.db.artists;
   }
 
-  deleteArtist(artistId: string) {
-    if (!uuidValidate(artistId)) {
-      throw new HttpException(
-        'TrackId is invalid (not uuid)',
-        HttpStatus.BAD_REQUEST,
-      );
+  async findOneArtist(id: string) {
+    const currentArtist = this.db.artists.find((artist) => artist.id === id);
+    if (!currentArtist) {
+      throw new NotFoundException(`Artist with id ${id} not found`);
     }
-    const initialLength = this.artistsDB.length;
-    this.artistsDB = this.artistsDB.filter(artist => artist.id !== artistId);
-    return this.artistsDB.length !== initialLength;
+    return currentArtist;
+  }
+
+  async updateArtist(id: string, updateArtistDto: UpdateArtistsDto) {
+    const currentArtist = await this.findOneArtist(id);
+
+    currentArtist.name = updateArtistDto.name;
+    currentArtist.grammy = updateArtistDto.grammy;
+
+    return currentArtist;
+  }
+
+  async removeArtist(id: string) {
+    const artistExists = this.db.artists.some((artist) => artist.id === id);
+    if (!artistExists) {
+      throw new NotFoundException(`Artist with ID ${id} not found`);
+    }
+
+    this.db.tracks.forEach((track) => {
+      if (track.artistId === id) {
+        track.artistId = null;
+      }
+    });
+
+    this.db.albums.forEach((album) => {
+      if (album.artistId === id) {
+        album.artistId = null;
+      }
+    });
+
+    this.db.favorites.artists = this.db.favorites.artists.filter(
+      (storedId) => storedId !== id,
+    );
+
+    this.db.artists = this.db.artists.filter((artist) => artist.id !== id);
   }
 }

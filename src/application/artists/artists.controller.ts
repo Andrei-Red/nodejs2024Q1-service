@@ -1,32 +1,47 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  ParseUUIDPipe,
+  Controller,
+  HttpCode,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  Put,
+} from '@nestjs/common';
 import { ArtistsService } from './artists.service';
+import { CreateArtistsDto, UpdateArtistsDto } from './artists.dto';
 
 @Controller('artist')
-export class ArtistsController {
-  constructor(private artistService: ArtistsService) {}
+export class ArtistController {
+  constructor(private readonly artistsService: ArtistsService) {}
+
+  @Post()
+  createArtist(@Body() createArtistDto: CreateArtistsDto) {
+    return this.artistsService.createArtist(createArtistDto);
+  }
 
   @Get()
-  getArtists() {
-    return this.artistService.getArtists();
+  findAllArtists() {
+    return this.artistsService.findAllArtists();
   }
 
   @Get(':id')
-  getArtistById(@Param('id') id: string) {
-    return this.artistService.getArtistById(id);
-  }
-
-  @Post()
-  addNewArtist(@Body() artist) {
-    return this.artistService.addNewArtist(artist);
+  findOneArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.artistsService.findOneArtist(id);
   }
 
   @Put(':id')
-  updateArtist(@Param('id') id: string, @Body() artist) {
-    return this.artistService.updateArtist(artist, id);
+  updateArtist(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateArtistDto: UpdateArtistsDto,
+  ) {
+    return this.artistsService.updateArtist(id, updateArtistDto);
   }
 
   @Delete(':id')
-  deleteArtist(@Param('id') id: string) {
-    return this.artistService.deleteArtist(id);
+  @HttpCode(204)
+  removeArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.artistsService.removeArtist(id);
   }
 }

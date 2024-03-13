@@ -5,10 +5,10 @@ export const enum DbEntities {
   ALBUMS = 'albums',
 }
 export interface Album {
-  name: string
-  year: number
-  artistId: string | null
-  id: string
+  id: string;
+  name: string;
+  year: number;
+  artistId: string | null;
 }
 
 export interface Track {
@@ -17,4 +17,10 @@ export interface Track {
   artistId: string | null;
   albumId: string | null;
   duration: number;
+}
+
+export interface Artist {
+  id: string;
+  name: string;
+  grammy: boolean;
 }
